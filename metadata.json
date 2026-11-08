@@ -1,0 +1,6 @@
+{
+  "name": "Inspire Typing",
+  "description": "Type Faster. Work Smarter. Free English & Urdu touch typing tutor with interactive lessons, timed tests, animated keyboard, certificates, and global leaderboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
