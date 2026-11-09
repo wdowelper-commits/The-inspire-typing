@@ -25,6 +25,7 @@ import { downloadCertificate } from '../lib/certificateGenerator';
 import { ENGLISH_LESSONS } from '../data/englishLessons';
 import { URDU_PHONETIC_LESSONS } from '../data/urduPhoneticLessons';
 import { URDU_STANDARD_LESSONS } from '../data/urduStandardLessons';
+import { AdBanner } from '../components/ads/AdBanner';
 
 export const DashboardPage: React.FC = () => {
   const { user } = useAuthStore();
@@ -136,37 +137,46 @@ export const DashboardPage: React.FC = () => {
         />
       </div>
 
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Zap className="w-4 h-4 text-blue-600" /> WPM Speed Trajectory
-              </h3>
-              <p className="text-xs text-slate-500">Historical performance across timed evaluations</p>
+      {/* Charts Section & Right Sidebar Ad */}
+      <div className="flex flex-col xl:flex-row gap-6 items-start mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 w-full">
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-blue-600" /> WPM Speed Trajectory
+                </h3>
+                <p className="text-xs text-slate-500">Historical performance across timed evaluations</p>
+              </div>
+              <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">
+                Peak: {bestWpm} WPM
+              </span>
             </div>
-            <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">
-              Peak: {bestWpm} WPM
-            </span>
-          </div>
-          <WPMChart data={chartData} />
-        </Card>
+            <WPMChart data={chartData} />
+          </Card>
 
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Target className="w-4 h-4 text-emerald-600" /> Accuracy Consistency
-              </h3>
-              <p className="text-xs text-slate-500">Percentage accuracy curve over time</p>
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <Target className="w-4 h-4 text-emerald-600" /> Accuracy Consistency
+                </h3>
+                <p className="text-xs text-slate-500">Percentage accuracy curve over time</p>
+              </div>
+              <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
+                Avg: {avgAccuracy}%
+              </span>
             </div>
-            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
-              Avg: {avgAccuracy}%
-            </span>
+            <AccuracyChart data={chartData} />
+          </Card>
+        </div>
+
+        {/* Right Side: Adsterra 160x600 Ad */}
+        <aside className="w-full xl:w-[176px] flex flex-col items-center shrink-0">
+          <div className="sticky top-24">
+            <AdBanner size="160x600" />
           </div>
-          <AccuracyChart data={chartData} />
-        </Card>
+        </aside>
       </div>
 
       {/* Lesson Progress by Language */}

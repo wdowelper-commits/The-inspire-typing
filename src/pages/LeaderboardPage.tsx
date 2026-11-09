@@ -7,6 +7,7 @@ import { dataService } from '../lib/supabase';
 import { TestResult } from '../types';
 import { useAuthStore } from '../stores/authStore';
 import { Link } from 'react-router-dom';
+import { AdBanner } from '../components/ads/AdBanner';
 
 export const LeaderboardPage: React.FC = () => {
   const { isGuest } = useAuthStore();
@@ -113,8 +114,19 @@ export const LeaderboardPage: React.FC = () => {
         </div>
       )}
 
-      {/* Table */}
-      <LeaderboardTable results={results} loading={loading} />
+      {/* Main Content with Right Side Skyscraper Ad */}
+      <div className="flex flex-col lg:flex-row items-start gap-6">
+        <div className="flex-1 min-w-0 w-full">
+          <LeaderboardTable results={results} loading={loading} />
+        </div>
+
+        {/* Right Side: Skyscraper Ad */}
+        <aside className="w-full lg:w-[176px] flex flex-col items-center shrink-0">
+          <div className="sticky top-24">
+            <AdBanner size="160x600" />
+          </div>
+        </aside>
+      </div>
     </PageWrapper>
   );
 };

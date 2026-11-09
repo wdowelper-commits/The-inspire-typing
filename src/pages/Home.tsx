@@ -21,6 +21,7 @@ import { TestResult } from '../types';
 import { useSettingsStore } from '../stores/settingsStore';
 import { useAuthStore } from '../stores/authStore';
 import { isAICoachAvailable } from '../lib/aiCoach';
+import { AdBanner } from '../components/ads/AdBanner';
 
 export const Home: React.FC<{ onOpenAICoach?: () => void }> = ({ onOpenAICoach }) => {
   const navigate = useNavigate();
@@ -139,8 +140,8 @@ export const Home: React.FC<{ onOpenAICoach?: () => void }> = ({ onOpenAICoach }
               </div>
             </div>
 
-            {/* Right Column: Interactive Keyboard Visual Preview */}
-            <div className="lg:col-span-5 flex justify-center">
+            {/* Right Column: Interactive Keyboard Visual Preview & Adsterra Ad */}
+            <div className="lg:col-span-5 flex flex-col xl:flex-row items-center justify-center gap-4">
               <div className="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-slate-200/80 relative">
                 {/* Visual badge */}
                 <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
@@ -198,6 +199,11 @@ export const Home: React.FC<{ onOpenAICoach?: () => void }> = ({ onOpenAICoach }
                     Explore all 36 interactive lessons <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
+              </div>
+
+              {/* Right Side: Adsterra 160x300 Ad Unit */}
+              <div className="shrink-0 flex justify-center">
+                <AdBanner size="160x300" />
               </div>
             </div>
           </div>
