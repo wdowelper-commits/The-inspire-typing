@@ -1,6 +1,9 @@
 -- ==============================================================================
 -- INSPIRE TYPING - COMPLETE SUPABASE DATABASE SETUP & SCHEMA
 -- Run this entire script in Supabase Dashboard -> SQL Editor -> New Query -> Run
+--
+-- ADMIN SETUP:
+-- To set admin: UPDATE profiles SET user_role='admin' WHERE email='admin@inspiretyping.com';
 -- ==============================================================================
 
 -- 1. Enable required extensions

@@ -10,13 +10,16 @@ import {
   EyeOff,
   AlertTriangle,
   Award,
+  Settings,
 } from 'lucide-react';
 import { PageWrapper } from '../components/layout/PageWrapper';
 import { Button } from '../components/ui/Button';
 import { StatsBar } from '../components/typing/StatsBar';
 import { TypingArea } from '../components/typing/TypingArea';
-import { Keyboard } from '../components/typing/Keyboard';
+import { Keyboard, KEY_FINGER_MAP, FINGER_CONFIGS } from '../components/typing/Keyboard';
 import { ResultModal } from '../components/typing/ResultModal';
+import { ReadAloudSettingsModal } from '../components/typing/ReadAloudSettingsModal';
+import { voiceGuidance } from '../lib/voiceGuidance';
 import { useTypingEngine } from '../hooks/useTypingEngine';
 import { useKeyboard } from '../hooks/useKeyboard';
 import { useTimer } from '../hooks/useTimer';
@@ -36,7 +39,17 @@ const DURATIONS = [
 export const TestPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { language: storeLang, setLanguage, showKeyboard, toggleKeyboard, fingerGuideEnabled, toggleFingerGuide } = useSettingsStore();
+  const {
+    language: storeLang,
+    setLanguage,
+    showKeyboard,
+    toggleKeyboard,
+    fingerGuideEnabled,
+    toggleFingerGuide,
+    readAloudEnabled,
+    readAloudVolume,
+    readAloudSpeed,
+  } = useSettingsStore();
   const { setLastResult } = useTypingStore();
 
   const [testLang, setTestLang] = useState<Language>(storeLang);
@@ -44,6 +57,7 @@ export const TestPage: React.FC = () => {
   const [paragraphIndex, setParagraphIndex] = useState<number>(0);
   const [isResultOpen, setIsResultOpen] = useState(false);
   const [completedStats, setCompletedStats] = useState<TypingStats | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   // Check if custom drill text passed from AI coach
   const customDrillText = (location.state as any)?.customText;
@@ -128,6 +142,20 @@ export const TestPage: React.FC = () => {
   const nextChar = targetText[engine.currentIndex];
   const { nextKey, requiresShift } = useKeyboard({ targetChar: nextChar, language: testLang });
 
+  // Read Aloud / Voice Guidance Effect
+  useEffect(() => {
+    if (readAloudEnabled && nextKey && !engine.isComplete) {
+      const fingerId = KEY_FINGER_MAP[nextKey.toLowerCase()] || 'left-pinky';
+      const finger = FINGER_CONFIGS[fingerId];
+      voiceGuidance.speakKeyInstruction(
+        nextKey,
+        finger?.nameEn || 'index',
+        testLang.startsWith('urdu'),
+        { volume: readAloudVolume, rate: readAloudSpeed }
+      );
+    }
+  }, [engine.currentIndex, nextKey, readAloudEnabled, readAloudVolume, readAloudSpeed, testLang, engine.isComplete]);
+
   return (
     <PageWrapper maxWidth="normal" className="py-1.5 sm:py-2.5 px-2 sm:px-4">
       {/* Test Setup Header Toolbar (compact ~40px) */}
@@ -209,6 +237,17 @@ export const TestPage: React.FC = () => {
             <span className="hidden sm:inline">{showKeyboard ? 'Hide Keys' : 'Show Keys'}</span>
           </Button>
 
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={() => setSettingsOpen(true)}
+            icon={<Settings className="w-3.5 h-3.5 text-slate-600" />}
+            title="Read Aloud / Voice Guidance Settings"
+          >
+            <span className="hidden sm:inline">Voice</span>
+          </Button>
+
           {showKeyboard && (
             <label className="inline-flex items-center gap-1 px-2 h-7 rounded-lg border border-slate-200 bg-white text-[11px] font-semibold text-slate-700 cursor-pointer hover:bg-slate-50 transition-colors select-none">
               <input
@@ -276,6 +315,9 @@ export const TestPage: React.FC = () => {
           onRetry={handleRestart}
         />
       )}
+
+      {/* Voice Guidance Settings Modal */}
+      <ReadAloudSettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </PageWrapper>
   );
 };

@@ -22,7 +22,7 @@ export const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }
   }
 
   if (user.user_role !== 'admin') {
-    return <Navigate to="/?error=access-denied" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;

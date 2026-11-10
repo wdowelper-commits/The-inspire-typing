@@ -23,7 +23,7 @@ import { isAICoachAvailable } from '../../lib/aiCoach';
 export const Navbar: React.FC<{ onOpenAICoach?: () => void }> = ({ onOpenAICoach }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, isGuest, signOut, setUserRole } = useAuthStore();
+  const { user, isGuest, signOut } = useAuthStore();
   const { language, setLanguage, soundEnabled, toggleSound } = useSettingsStore();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -33,6 +33,7 @@ export const Navbar: React.FC<{ onOpenAICoach?: () => void }> = ({ onOpenAICoach
   const navLinks = [
     { label: 'Lessons', path: `/lessons/${language}` },
     { label: 'Speed Test', path: '/test' },
+    { label: 'Games', path: '/games' },
     { label: 'Leaderboard', path: '/leaderboard' },
   ];
 
@@ -246,20 +247,6 @@ export const Navbar: React.FC<{ onOpenAICoach?: () => void }> = ({ onOpenAICoach
                   )}
 
                   <div className="border-t border-slate-100 my-1" />
-
-                  {/* Convenient role switch helper for testing */}
-                  <div className="px-4 py-1.5 flex items-center justify-between text-xs text-slate-500">
-                    <span>Role mode:</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setUserRole(user.user_role === 'admin' ? 'user' : 'admin');
-                      }}
-                      className="font-bold text-blue-600 hover:underline"
-                    >
-                      Switch to {user.user_role === 'admin' ? 'User' : 'Admin'}
-                    </button>
-                  </div>
 
                   <button
                     type="button"

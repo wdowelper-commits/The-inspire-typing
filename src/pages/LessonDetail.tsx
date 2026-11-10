@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -10,13 +10,16 @@ import {
   Sparkles,
   Volume2,
   VolumeX,
+  Settings,
 } from 'lucide-react';
 import { PageWrapper } from '../components/layout/PageWrapper';
 import { Button } from '../components/ui/Button';
 import { StatsBar } from '../components/typing/StatsBar';
 import { TypingArea } from '../components/typing/TypingArea';
-import { Keyboard } from '../components/typing/Keyboard';
+import { Keyboard, KEY_FINGER_MAP, FINGER_CONFIGS } from '../components/typing/Keyboard';
 import { ResultModal } from '../components/typing/ResultModal';
+import { ReadAloudSettingsModal } from '../components/typing/ReadAloudSettingsModal';
+import { voiceGuidance } from '../lib/voiceGuidance';
 import { useTypingEngine } from '../hooks/useTypingEngine';
 import { useKeyboard } from '../hooks/useKeyboard';
 import { useTimer } from '../hooks/useTimer';
@@ -30,11 +33,22 @@ import { URDU_STANDARD_LESSONS } from '../data/urduStandardLessons';
 export const LessonDetail: React.FC = () => {
   const { language: routeLang, lessonId } = useParams<{ language: string; lessonId: string }>();
   const navigate = useNavigate();
-  const { showKeyboard, toggleKeyboard, soundEnabled, toggleSound, fingerGuideEnabled, toggleFingerGuide } = useSettingsStore();
+  const {
+    showKeyboard,
+    toggleKeyboard,
+    soundEnabled,
+    toggleSound,
+    fingerGuideEnabled,
+    toggleFingerGuide,
+    readAloudEnabled,
+    readAloudVolume,
+    readAloudSpeed,
+  } = useSettingsStore();
   const { setLastResult } = useTypingStore();
 
   const [isResultOpen, setIsResultOpen] = useState(false);
   const [completedStats, setCompletedStats] = useState<TypingStats | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const lang: Language = (routeLang as Language) || 'english';
 
@@ -97,6 +111,20 @@ export const LessonDetail: React.FC = () => {
   // On-screen keyboard key resolution
   const nextChar = targetText[engine.currentIndex];
   const { nextKey, requiresShift } = useKeyboard({ targetChar: nextChar, language: lang });
+
+  // Read Aloud / Voice Guidance Effect
+  useEffect(() => {
+    if (readAloudEnabled && nextKey && !engine.isComplete) {
+      const fingerId = KEY_FINGER_MAP[nextKey.toLowerCase()] || 'left-pinky';
+      const finger = FINGER_CONFIGS[fingerId];
+      voiceGuidance.speakKeyInstruction(
+        nextKey,
+        finger?.nameEn || 'index',
+        lang.startsWith('urdu'),
+        { volume: readAloudVolume, rate: readAloudSpeed }
+      );
+    }
+  }, [engine.currentIndex, nextKey, readAloudEnabled, readAloudVolume, readAloudSpeed, lang, engine.isComplete]);
 
   const handleRestart = () => {
     setIsResultOpen(false);
@@ -172,6 +200,17 @@ export const LessonDetail: React.FC = () => {
             icon={showKeyboard ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
           >
             <span className="hidden sm:inline">{showKeyboard ? 'Hide Keys' : 'Show Keys'}</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={() => setSettingsOpen(true)}
+            icon={<Settings className="w-3.5 h-3.5 text-slate-600" />}
+            title="Read Aloud / Voice Guidance Settings"
+          >
+            <span className="hidden sm:inline">Voice</span>
           </Button>
 
           {showKeyboard && (
@@ -292,6 +331,12 @@ export const LessonDetail: React.FC = () => {
           onNext={nextBundle ? handleNextLesson : undefined}
         />
       )}
+
+      {/* Voice Guidance / Read Aloud Settings Modal */}
+      <ReadAloudSettingsModal
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+      />
     </PageWrapper>
   );
 };

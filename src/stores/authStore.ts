@@ -13,6 +13,7 @@ interface AuthState {
   signOut: () => Promise<void>;
   setGuestMode: () => void;
   setUserRole: (role: UserRole) => void;
+  updateUserProfile: (updates: Partial<Profile>) => Promise<void>;
   refreshStreak: () => Promise<void>;
 }
 
@@ -214,6 +215,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const updated = { ...current, user_role: role };
       localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(updated));
       set({ user: updated });
+    }
+  },
+
+  updateUserProfile: async (updates: Partial<Profile>) => {
+    const current = get().user;
+    if (current) {
+      const updated: Profile = { ...current, ...updates };
+      localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(updated));
+      set({ user: updated });
+      if (updates.display_name || updates.avatar_url !== undefined) {
+        await dataService.updateProfile(current.id, {
+          display_name: updates.display_name,
+          avatar_url: updates.avatar_url ?? undefined,
+        });
+      }
     }
   },
 

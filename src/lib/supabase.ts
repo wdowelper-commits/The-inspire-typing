@@ -318,4 +318,54 @@ export const dataService = {
       testsTaken: 12580 + tests.length,
     };
   },
+
+  async updateProfile(userId: string, updates: { display_name?: string; avatar_url?: string }): Promise<boolean> {
+    if (supabase) {
+      try {
+        const { error } = await supabase.from('profiles').update(updates).eq('id', userId);
+        if (error) {
+          console.warn('Supabase profile update warning:', error);
+        }
+      } catch (err) {
+        console.warn('Failed to update profile in Supabase:', err);
+      }
+    }
+    return true;
+  },
+
+  async uploadAvatar(userId: string, file: File): Promise<string | null> {
+    if (supabase) {
+      try {
+        const fileExt = file.name.split('.').pop() || 'png';
+        const fileName = `${userId}-${Date.now()}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(filePath, file, { upsert: true });
+
+        if (uploadError) {
+          console.warn('Avatar upload to Supabase storage failed, using data URL fallback:', uploadError);
+          return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.readAsDataURL(file);
+          });
+        }
+
+        const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
+        return data?.publicUrl || null;
+      } catch (e) {
+        console.warn('Upload error, falling back to data URL:', e);
+      }
+    }
+
+    // Local data URL fallback
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.readAsDataURL(file);
+    });
+  },
 };
+

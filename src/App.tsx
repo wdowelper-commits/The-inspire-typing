@@ -23,6 +23,12 @@ const CertificatePage = lazy(() => import('./pages/CertificatePage').then((m) =>
 const AuthPage = lazy(() => import('./pages/AuthPage').then((m) => ({ default: m.AuthPage })));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
 
+// Games Pages
+const GamesPage = lazy(() => import('./pages/games/GamesPage').then((m) => ({ default: m.GamesPage })));
+const KeyCatcherGame = lazy(() => import('./pages/games/KeyCatcherGame').then((m) => ({ default: m.KeyCatcherGame })));
+const WordBalloonGame = lazy(() => import('./pages/games/WordBalloonGame').then((m) => ({ default: m.WordBalloonGame })));
+const SpeedRaceGame = lazy(() => import('./pages/games/SpeedRaceGame').then((m) => ({ default: m.SpeedRaceGame })));
+
 // Admin Pages
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard').then((m) => ({ default: m.AdminDashboard })));
 const AdminUsers = lazy(() => import('./pages/admin/AdminUsers').then((m) => ({ default: m.AdminUsers })));
@@ -53,6 +59,10 @@ export default function App() {
               <Route path="/lessons/:language" element={<LessonsPage />} />
               <Route path="/lessons/:language/:lessonId" element={<LessonDetail />} />
               <Route path="/test" element={<TestPage />} />
+              <Route path="/games" element={<GamesPage />} />
+              <Route path="/games/key-catcher" element={<KeyCatcherGame />} />
+              <Route path="/games/word-balloon" element={<WordBalloonGame />} />
+              <Route path="/games/speed-race" element={<SpeedRaceGame />} />
               <Route path="/leaderboard" element={<LeaderboardPage />} />
 
               {/* Auth Routes */}
